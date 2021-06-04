@@ -1477,6 +1477,7 @@
 									"Custom",
 									"Bitbucket",
 									"BitbucketServer",
+									"Gerrit",
 									"Gitea",
 									"GitHub",
 									"GitLab"
