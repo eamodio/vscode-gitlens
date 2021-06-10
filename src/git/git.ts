@@ -746,6 +746,7 @@ export namespace Git {
 			format = 'default',
 			limit,
 			merges,
+			noMergeCommits,
 			ordering,
 			reverse,
 			similarityThreshold,
@@ -756,6 +757,7 @@ export namespace Git {
 			format?: 'default' | 'refs' | 'shortlog' | 'shortlog+stats';
 			limit?: number;
 			merges?: boolean;
+			noMergeCommits?: boolean;
 			ordering?: string | null;
 			reverse?: boolean;
 			similarityThreshold?: number | null;
@@ -792,6 +794,10 @@ export namespace Git {
 
 		if (since) {
 			params.push(`--since="${since}"`);
+		}
+
+		if(noMergeCommits) {
+			params.push('--no-merges');
 		}
 
 		if (!merges) {

@@ -4552,6 +4552,18 @@
 				"icon": "$(filter)"
 			},
 			{
+				"command": "gitlens.views.commits.setNoMergeCommitsOff",
+				"title": "Toggle Filter: Show Merge Commits",
+				"category": "GitLens",
+				"icon": "$(filter)"
+			},
+			{
+				"command": "gitlens.views.commits.setNoMergeCommitsOn",
+				"title": "Toggle Filter: No Merge Commits",
+				"category": "GitLens",
+				"icon": "$(filter)"
+			},
+			{
 				"command": "gitlens.views.commits.setShowAvatarsOn",
 				"title": "Show Avatars",
 				"category": "GitLens"
@@ -6146,6 +6158,14 @@
 					"when": "false"
 				},
 				{
+					"command": "gitlens.views.commits.setNoMergeCommitsOff",
+					"when": "false"
+				},
+				{
+					"command": "gitlens.views.commits.setNoMergeCommitsOn",
+					"when": "false"
+				},
+				{
 					"command": "gitlens.views.commits.setShowAvatarsOn",
 					"when": "false"
 				},
@@ -7079,6 +7099,11 @@
 					"group": "navigation@50"
 				},
 				{
+					"command": "gitlens.views.commits.setNoMergeCommitsOff",
+					"when": "view =~ /^gitlens\\.views\\.commits/ && gitlens:views:commits:noMergeCommits",
+					"group": "navigation@50"
+				},
+				{
 					"command": "gitlens.views.commits.refresh",
 					"when": "view =~ /^gitlens\\.views\\.commits/",
 					"group": "navigation@99"
@@ -7091,6 +7116,16 @@
 				{
 					"command": "gitlens.views.commits.setMyCommitsOnlyOff",
 					"when": "view =~ /^gitlens\\.views\\.commits/ && gitlens:views:commits:myCommitsOnly",
+					"group": "3_gitlens@0"
+				},
+				{
+					"command": "gitlens.views.commits.setNoMergeCommitsOff",
+					"when": "view =~ /^gitlens\\.views\\.commits/ && gitlens:views:commits:noMergeCommits",
+					"group": "3_gitlens@0"
+				},
+				{
+					"command": "gitlens.views.commits.setNoMergeCommitsOn",
+					"when": "view =~ /^gitlens\\.views\\.commits/ && !gitlens:views:commits:noMergeCommits",
 					"group": "3_gitlens@0"
 				},
 				{
