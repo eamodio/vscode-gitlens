@@ -5,6 +5,7 @@ import { AzureDevOpsRemote } from './azure-devops';
 import { BitbucketRemote } from './bitbucket';
 import { BitbucketServerRemote } from './bitbucket-server';
 import { CustomRemote } from './custom';
+import { GerritRemote } from './gerrit';
 import { GiteaRemote } from './gitea';
 import { GitHubRemote } from './github';
 import { GitLabRemote } from './gitlab';
@@ -57,6 +58,11 @@ const builtInProviders: RemoteProviders = [
 		custom: false,
 		matcher: /\bgitea\b/i,
 		creator: (domain: string, path: string) => new GiteaRemote(domain, path),
+	},
+	{
+		custom: false,
+		matcher: /\bgooglesource\.com$/i,
+		creator: (domain: string, path: string) => new GerritRemote(domain, path),
 	},
 ];
 
@@ -131,6 +137,8 @@ export class RemoteProviderFactory {
 			case CustomRemoteType.Custom:
 				return (domain: string, path: string) =>
 					new CustomRemote(domain, path, cfg.urls!, cfg.protocol, cfg.name);
+			case CustomRemoteType.Gerrit:
+				return (domain: string, path: string) => new GerritRemote(domain, path, cfg.protocol, cfg.name, true);
 			case CustomRemoteType.Gitea:
 				return (domain: string, path: string) => new GiteaRemote(domain, path, cfg.protocol, cfg.name, true);
 			case CustomRemoteType.GitHub:
