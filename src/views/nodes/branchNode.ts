@@ -48,6 +48,7 @@ export class BranchNode
 		showStatus: boolean;
 		showTracking: boolean;
 		authors?: string[];
+		noMergeCommits?: boolean;
 	};
 	protected override splatted = true;
 
@@ -68,6 +69,7 @@ export class BranchNode
 			showStatus?: boolean;
 			showTracking?: boolean;
 			authors?: string[];
+			noMergeCommits?: boolean;
 		},
 	) {
 		super(uri, view, parent);
@@ -454,6 +456,7 @@ export class BranchNode
 				limit: limit,
 				ref: this.ref.ref,
 				authors: this.options?.authors,
+				noMergeCommits: this.options?.noMergeCommits,
 			});
 		}
 

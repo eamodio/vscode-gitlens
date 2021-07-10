@@ -1942,6 +1942,7 @@ export class GitService implements Disposable {
 			authors?: string[];
 			limit?: number;
 			merges?: boolean;
+			noMergeCommits?: boolean;
 			ordering?: string | null;
 			ref?: string;
 			reverse?: boolean;
@@ -1955,6 +1956,7 @@ export class GitService implements Disposable {
 				...options,
 				limit: limit,
 				merges: options.merges == null ? true : options.merges,
+				noMergeCommits: options.noMergeCommits ?? false,
 				ordering: options.ordering ?? Container.config.advanced.commitOrdering,
 				similarityThreshold: Container.config.advanced.similarityThreshold,
 			});

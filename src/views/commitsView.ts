@@ -60,6 +60,7 @@ export class CommitsRepositoryNode extends RepositoryFolderNode<CommitsView, Bra
 				showCurrent: false,
 				showTracking: true,
 				authors: authors,
+				noMergeCommits: this.view.state.noMergeCommits,
 			});
 		}
 
@@ -200,6 +201,7 @@ export class CommitsViewNode extends ViewNode<CommitsView> {
 
 interface CommitsViewState {
 	myCommitsOnly?: boolean;
+	noMergeCommits?: boolean;
 }
 
 export class CommitsView extends ViewBase<CommitsViewNode, CommitsViewConfig> {
@@ -257,6 +259,16 @@ export class CommitsView extends ViewBase<CommitsViewNode, CommitsViewConfig> {
 		commands.registerCommand(
 			this.getQualifiedCommand('setMyCommitsOnlyOff'),
 			() => this.setMyCommitsOnly(false),
+			this,
+		);
+		commands.registerCommand(
+			this.getQualifiedCommand('setNoMergeCommitsOn'),
+			() => this.setNoMergeCommits(true),
+			this,
+		);
+		commands.registerCommand(
+			this.getQualifiedCommand('setNoMergeCommitsOff'),
+			() => this.setNoMergeCommits(false),
 			this,
 		);
 		commands.registerCommand(this.getQualifiedCommand('setShowAvatarsOn'), () => this.setShowAvatars(true), this);
@@ -378,6 +390,12 @@ export class CommitsView extends ViewBase<CommitsViewNode, CommitsViewConfig> {
 	private setMyCommitsOnly(enabled: boolean) {
 		void setContext(ContextKeys.ViewsCommitsMyCommitsOnly, enabled);
 		this.state.myCommitsOnly = enabled;
+		void this.refresh(true);
+	}
+
+	private setNoMergeCommits(enabled: boolean) {
+		void setContext(ContextKeys.ViewsCommitsNoMergeCommits, enabled);
+		this.state.noMergeCommits = enabled;
 		void this.refresh(true);
 	}
 
