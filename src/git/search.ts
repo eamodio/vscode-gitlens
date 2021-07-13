@@ -39,10 +39,9 @@ export interface SearchPattern {
 export namespace SearchPattern {
 	const emptyStr = '';
 
-	const searchMessageOperationRegex = /(?=(.*?)\s?(?:(?:=:|message:|@:|author:|#:|commit:|\?:|file:|~:|change:)|$))/;
 	const searchMessageValuesRegex = /(".+"|[^\b\s]+)/g;
 	const searchOperationRegex =
-		/((?:=|message|@|author|#|commit|\?|file|~|change):)\s?(?=(.*?)\s?(?:(?:=:|message:|@:|author:|#:|commit:|\?:|file:|~:|change:)|$))/g;
+		/((?:=|message|@|author|#|commit|\?|file|~|change):)\s?(.*?)(?=\s?(?:(?:=:|message:|@:|author:|#:|commit:|\?:|file:|~:|change:)|$))/g;
 
 	export function fromCommit(ref: string): string;
 	export function fromCommit(commit: GitRevisionReference): string;
@@ -61,79 +60,71 @@ export namespace SearchPattern {
 
 		let op;
 		let value;
+		let freeTextTerm;
 
-		let match = searchMessageOperationRegex.exec(search);
-		if (match != null && match[1] !== '') {
-			[, value] = match;
+		let match = searchOperationRegex.exec(search);
 
-			if (GitRevision.isSha(value)) {
-				let values = operations.get('commit:');
-				if (values === undefined) {
-					values = [value];
-					operations.set('commit:', values);
-				} else {
-					values.push(value);
-				}
-			} else {
-				parseSearchMessageOperations(value, operations);
-			}
+		if (match == null || match.index > 0) {
+			freeTextTerm = search.substring(0, match?.index).trimEnd();
 		}
 
-		do {
-			match = searchOperationRegex.exec(search);
-			if (match == null) break;
-
+		while (match != null) {
 			[, op, value] = match;
 
 			if (op !== undefined) {
 				op = normalizeSearchOperatorsMap.get(op as SearchOperators)!;
+				let firstMessageMatch;
 
 				if (op === 'message:') {
 					parseSearchMessageOperations(value, operations);
+				} else if (
+					!freeTextTerm &&
+					match.index + match[0].length === search.length &&
+					(firstMessageMatch = new RegExp(searchMessageValuesRegex).exec(value)) != null
+				) {
+					const [, firstMessage] = firstMessageMatch;
+					addSearchOperationValue(op, firstMessage, operations);
+					freeTextTerm = value.substring(firstMessage.length).trimStart();
 				} else {
-					let values = operations.get(op);
-					if (values === undefined) {
-						values = [value];
-						operations.set(op, values);
-					} else {
-						values.push(value);
-					}
+					addSearchOperationValue(op, value, operations);
 				}
 			}
-		} while (true);
+
+			match = searchOperationRegex.exec(search);
+		}
+
+		if (freeTextTerm) {
+			if (GitRevision.isSha(freeTextTerm)) {
+				addSearchOperationValue('commit:', freeTextTerm, operations);
+			} else {
+				parseSearchMessageOperations(freeTextTerm, operations);
+			}
+		}
 
 		return operations;
 	}
 
+	function addSearchOperationValue(op: SearchOperators, value: string, operations: Map<string, string[]>) {
+		let values = operations.get(op);
+		if (values === undefined) {
+			values = [value];
+			operations.set(op, values);
+		} else {
+			values.push(value);
+		}
+	}
+
 	function parseSearchMessageOperations(message: string, operations: Map<string, string[]>) {
-		let values = operations.get('message:');
-
 		if (message === emptyStr) {
-			if (values === undefined) {
-				values = [''];
-				operations.set('message:', values);
-			} else {
-				values.push('');
-			}
-
+			addSearchOperationValue('message:', emptyStr, operations);
 			return;
 		}
 
 		let match;
-		let value;
-		do {
-			match = searchMessageValuesRegex.exec(message);
-			if (match == null) break;
-
-			[, value] = match;
-
-			if (values === undefined) {
-				values = [value];
-				operations.set('message:', values);
-			} else {
-				values.push(value);
-			}
-		} while (true);
+		while ((match = searchMessageValuesRegex.exec(message)) != null) {
+			const [, value] = match;
+			addSearchOperationValue('message:', value, operations);
+		}
 	}
 
 	export function toKey(search: SearchPattern) {
