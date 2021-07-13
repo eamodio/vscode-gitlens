@@ -46,12 +46,18 @@ export class AzureDevOpsRemote extends RemoteProvider {
 	override get autolinks(): (AutolinkReference | DynamicAutolinkReference)[] {
 		if (this._autolinks === undefined) {
 			// Strip off any `_git` part from the repo url
-			const baseUrl = this.baseUrl.replace(gitRegex, '/');
+			const workUrl = this.baseUrl.replace(gitRegex, '/');
 			this._autolinks = [
 				{
 					prefix: '#',
-					url: `${baseUrl}/_workitems/edit/<num>`,
+					url: `${workUrl}/_workitems/edit/<num>`,
 					title: `Open Work Item #<num> on ${this.name}`,
+				},
+				{
+					// Default Pull request message when merging a PR in ADO. Will not catch commits & pushes following a different pattern.
+					prefix: 'Merged PR ',
+					url: `${this.baseUrl}/pullrequest/<num>`,
+					title: `Open Pull Request #<num> on ${this.name}`,
 				},
 			];
 		}
